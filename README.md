@@ -77,8 +77,9 @@ Quick formatting buttons for:
 ---
 
 ## Demo
+[![Netlify Status](https://api.netlify.com/api/v1/badges/fd647924-b870-4b34-a2b5-01c87e487344/deploy-status)](https://app.netlify.com/projects/markshare/deploys)
 
-Open [`index.html`](index.html) in a modern web browser to start using MarkShare immediately.
+Open [`markshare.netlify.app`](https://markshare.netlify.app/) in a modern web browser to start using MarkShare immediately.
 
 ---
 
