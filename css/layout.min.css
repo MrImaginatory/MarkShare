@@ -1,0 +1,235 @@
+#app-header,
+.pane-header {
+    border-bottom: 1px solid var(--border-color)
+}
+
+#app-footer,
+.pane-header {
+    padding: 0 var(--space-4);
+    font-size: .75rem
+}
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden
+}
+
+#app-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-4);
+    background-color: var(--bg-primary);
+    flex-shrink: 0
+}
+
+#main-content,
+.pane-header {
+    background-color: var(--bg-secondary)
+}
+
+#resizer,
+.header-center,
+.header-left,
+.header-right {
+    align-items: center;
+    display: flex
+}
+
+.header-left {
+    flex: 1
+}
+
+.header-center {
+    flex: 2;
+    justify-content: center
+}
+
+.header-right {
+    flex: 1;
+    justify-content: flex-end
+}
+
+#main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden
+}
+
+.pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0
+}
+
+#resizer {
+    width: 4px;
+    background-color: var(--border-color);
+    cursor: col-resize;
+    transition: background-color var(--transition-fast);
+    justify-content: center;
+    z-index: 10
+}
+
+#resizer:active,
+#resizer:hover {
+    background-color: var(--accent-color)
+}
+
+.pane-header {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-muted)
+}
+
+#app-footer,
+.pane-body {
+    background-color: var(--bg-primary)
+}
+
+.pane-header-title {
+    flex-shrink: 0
+}
+
+.pane-header-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px
+}
+
+.pane-header-toolbar .toolbar-btn {
+    padding: 2px 4px;
+    margin: 0;
+    border: none;
+    background: 0 0
+}
+
+.pane-header-toolbar .toolbar-btn .material-icons {
+    font-size: 16px
+}
+
+.pane-header-toolbar .toolbar-btn:hover {
+    background-color: var(--bg-elevated)
+}
+
+.pane-body {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    padding: var(--space-4)
+}
+
+#editor-container.pane-body {
+    padding: 0
+}
+
+.placeholder-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    font-style: italic;
+    font-family: var(--font-mono)
+}
+
+#app-footer {
+    height: var(--footer-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    font-family: var(--font-mono)
+}
+
+#mobile-toggle-bar {
+    display: none
+}
+
+@media (max-width:768px) {
+    #app-header {
+        height: auto;
+        min-height: var(--header-height);
+        flex-wrap: wrap;
+        padding: var(--space-2) var(--space-4);
+        gap: var(--space-2)
+    }
+
+    .header-center {
+        order: 3;
+        flex: 1 1 100%;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: var(--space-1)
+    }
+
+    .header-right {
+        order: 2
+    }
+
+    #mobile-toggle-bar {
+        display: flex;
+        justify-content: space-evenly
+    }
+
+    #main-content {
+        flex-direction: column
+    }
+
+    .pane {
+        width: 100% !important;
+        flex: 1 1 100% !important
+    }
+
+    #resizer {
+        display: none !important
+    }
+}
+
+@media print {
+
+    #app-footer,
+    #app-header,
+    #editor-pane,
+    #mobile-toggle-bar,
+    #resizer,
+    .pane-header {
+        display: none !important
+    }
+
+    #app-container,
+    #main-content {
+        height: auto;
+        overflow: visible;
+        display: block
+    }
+
+    #preview-pane {
+        width: 100%;
+        display: block
+    }
+
+    .pane-body {
+        overflow: visible;
+        padding: 0;
+        background: 0 0;
+        color: #000
+    }
+
+    body {
+        background: #fff;
+        color: #000
+    }
+}

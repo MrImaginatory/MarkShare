@@ -51,11 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Render Mermaid Diagrams
-        if (window.mermaid) {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            window.mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default' });
+        const mermaidBlocks = previewContainer.querySelectorAll('pre code.language-mermaid');
+        if (mermaidBlocks.length > 0) {
+            if (!window.mermaid) {
+                // Dynamically import Mermaid only when needed
+                const mermaidModule = await import("https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs");
+                window.mermaid = mermaidModule.default;
+                
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                window.mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default' });
+            } else {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                window.mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default' });
+            }
 
-            const mermaidBlocks = previewContainer.querySelectorAll('pre code.language-mermaid');
             for (let i = 0; i < mermaidBlocks.length; i++) {
                 const block = mermaidBlocks[i];
                 const pre = block.parentElement;
