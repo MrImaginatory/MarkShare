@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarkShare</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" id="favicon" href="Assests/logo.svg">
+    <!-- Normalize CSS for consistent rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css">
+
+    <!-- Parser & Sanitizer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+
+    <!-- Code Syntax Highlighting (Browser Bundle) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css"
+        id="hljs-theme">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <!-- Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.min.js"></script>
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=html" />
+    <!-- Our Design System & Layout -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+</head>
+
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img class="splash-logo" src="Assests/logo.svg" alt="Logo">
+    </div>
+
+    <div id="app-container" style="display:none;">
+        <!-- Top Navigation / Application Header -->
+        <header id="app-header">
+            <div class="header-left">
+                <img class="navbar-logo" src="Assests/logo.svg" alt="Logo">
+                <h1>MarkShare</h1>
+            </div>
+            <div class="header-center" id="toolbar">
+                <button id="btn-open" class="toolbar-btn" title="Open File"><span
+                        class="material-icons">folder_open</span></button>
+                <button id="btn-save" class="toolbar-btn" title="Save (Ctrl+S)"><span
+                        class="material-icons">save</span></button>
+                <span class="toolbar-divider"></span>
+                <button id="btn-export" class="toolbar-btn" title="Export HTML"><span
+                        class="material-symbols-outlined">html</span></button>
+                <button id="btn-print" class="toolbar-btn" title="Print/PDF"><span
+                        class="material-icons">print</span></button>
+                <button id="btn-reset" class="toolbar-btn text-danger" title="Clear All"><span
+                        class="material-icons">delete_sweep</span></button>
+                <span class="toolbar-divider"></span>
+                <button id="btn-sync-scroll" class="toolbar-btn active" title="Sync Scroll"><span
+                        class="material-icons">sync</span></button>
+                <span class="toolbar-divider"></span>
+                <button id="btn-view-editor" class="toolbar-btn" title="Editor Only"><span
+                        class="material-icons">edit_note</span></button>
+                <button id="btn-view-split" class="toolbar-btn active" title="Split View"><span
+                        class="material-icons">vertical_split</span></button>
+                <button id="btn-view-preview" class="toolbar-btn" title="Preview Only"><span
+                        class="material-icons">visibility</span></button>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="icon-button" aria-label="Toggle dark/light mode">
+                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="display:none;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mobile Segmented Control (Hidden on Desktop) -->
+        <div id="mobile-toggle-bar">
+            <button id="tab-editor" class="tab-btn active">Editor</button>
+            <button id="tab-preview" class="tab-btn">Preview</button>
+        </div>
+
+        <!-- Main Workspace (Editor & Preview) -->
+        <main id="main-content">
+            <div id="editor-pane" class="pane">
+                <div class="pane-header">
+                    <span class="pane-header-title">Editor</span>
+                    <div class="pane-header-toolbar">
+                        <button id="btn-bold" class="toolbar-btn" title="Bold (Ctrl+B)"><span
+                                class="material-icons">format_bold</span></button>
+                        <button id="btn-italic" class="toolbar-btn" title="Italic (Ctrl+I)"><span
+                                class="material-icons">format_italic</span></button>
+                        <button id="btn-link" class="toolbar-btn" title="Link (Ctrl+K)"><span
+                                class="material-icons">link</span></button>
+                        <button id="btn-code" class="toolbar-btn" title="Code Block"><span
+                                class="material-icons">code</span></button>
+                        <button id="btn-mermaid" class="toolbar-btn" title="Mermaid Diagram"><span
+                                class="material-icons">account_tree</span></button>
+                        <button id="btn-image" class="toolbar-btn" title="Insert Image"><span
+                                class="material-icons">image</span></button>
+                        <button id="btn-video" class="toolbar-btn" title="Insert Video"><span
+                                class="material-icons">movie</span></button>
+                        <button id="btn-reset" class="toolbar-btn text-danger" title="Clear All"><span
+                                class="material-icons">delete_sweep</span></button>
+                    </div>
+                </div>
+                <div id="editor-container" class="pane-body">
+                    <!-- CodeMirror goes here in Phase 2 -->
+                    <!-- <div class="placeholder-text">CodeMirror Loading (Phase 2)...</div> -->
+                </div>
+            </div>
+
+            <!-- Resizer Gutter (Phase 4) -->
+            <div id="resizer"></div>
+
+            <div id="preview-pane" class="pane">
+                <div class="pane-header">Preview</div>
+                <div id="preview-container" class="pane-body">
+                    <!-- Markdown Rendered Output goes here in Phase 3 -->
+                    <!-- <div class="placeholder-text">Preview Loading (Phase 3)...</div> -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Statusbar -->
+        <footer id="app-footer">
+            <div class="status-left">Ready</div>
+            <div class="status-right">
+                <span id="word-count">0 words</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Theme toggler & layout logic -->
+    <script src="js/theme.js"></script>
+    <script src="js/resizer.js"></script>
+    <script src="js/mobile.js"></script>
+    <!-- Editor logic (CodeMirror) -->
+    <script type="module" src="js/editor.js"></script>
+
+    <!-- Confirmation Dialog -->
+    <dialog id="reset-dialog" class="custom-dialog">
+        <div class="dialog-content">
+            <h3>Clear Editor?</h3>
+            <p>Are you sure you want to clear all contents? This action cannot be undone.</p>
+            <div class="dialog-actions">
+                <button id="btn-dialog-cancel" class="btn btn-secondary">Cancel</button>
+                <button id="btn-dialog-confirm" class="btn btn-danger">Yes, Clear All</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Splash Screen Logic -->
+    <script>
+        (function () {
+            // Show app after 1 second splash
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                const app = document.getElementById('app-container');
+                splash.classList.add('splash-fade-out');
+                app.style.display = 'flex';
+                // Remove splash from DOM after fade animation
+                setTimeout(() => splash.remove(), 500);
+            }, 1000);
+        })();
+    </script>
+</body>
+
+</html>

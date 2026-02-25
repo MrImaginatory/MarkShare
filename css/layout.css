@@ -1,0 +1,251 @@
+/**
+ * FORMAT-OFF-THE-GRID
+ * Application Layout Structure
+ */
+
+/* Full Viewport App Container */
+#app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* Header */
+#app-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-4);
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.header-left,
+.header-center,
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-left {
+    flex: 1;
+}
+
+.header-center {
+    flex: 2;
+    justify-content: center;
+}
+
+.header-right {
+    flex: 1;
+    justify-content: flex-end;
+}
+
+/* Main Two-Pane Workspace */
+#main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    background-color: var(--bg-secondary);
+}
+
+.pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* allows flex shrinking below content size */
+}
+
+/* Resizer / Gutter (Placeholder until Phase 4) */
+#resizer {
+    width: 4px;
+    background-color: var(--border-color);
+    cursor: col-resize;
+    transition: background-color var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+#resizer:hover,
+#resizer:active {
+    background-color: var(--accent-color);
+}
+
+/* Pane Headers */
+.pane-header {
+    height: 30px;
+    padding: 0 var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.pane-header-title {
+    flex-shrink: 0;
+}
+
+.pane-header-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.pane-header-toolbar .toolbar-btn {
+    padding: 2px 4px;
+    margin: 0;
+    border: none;
+    background: transparent;
+}
+
+.pane-header-toolbar .toolbar-btn .material-icons {
+    font-size: 16px;
+}
+
+.pane-header-toolbar .toolbar-btn:hover {
+    background-color: var(--bg-elevated);
+}
+
+/* Pane Content Areas */
+.pane-body {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    padding: var(--space-4);
+    background-color: var(--bg-primary);
+}
+
+#editor-container.pane-body {
+    padding: 0;
+}
+
+/* Developer placeholders */
+.placeholder-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    font-style: italic;
+    font-family: var(--font-mono);
+}
+
+/* Statusbar */
+#app-footer {
+    height: var(--footer-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-4);
+    background-color: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+}
+
+#mobile-toggle-bar {
+    display: none;
+}
+
+/* -------------------------------------
+   RESPONSIVE LAYOUT (MOBILE < 768px)
+   ------------------------------------- */
+
+@media (max-width: 768px) {
+
+    /* Stack elements and adjust toolbar */
+    #app-header {
+        height: auto;
+        min-height: var(--header-height);
+        flex-wrap: wrap;
+        padding: var(--space-2) var(--space-4);
+        gap: var(--space-2);
+    }
+
+    .header-center {
+        order: 3;
+        flex: 1 1 100%;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: var(--space-1);
+    }
+
+    .header-right {
+        order: 2;
+    }
+
+    #mobile-toggle-bar {
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    /* Force panes into stacked structure, handle visibility via JS */
+    #main-content {
+        flex-direction: column;
+    }
+
+    .pane {
+        width: 100% !important;
+        /* override JS flex-basis */
+        flex: 1 1 100% !important;
+    }
+
+    /* Hide the gutter */
+    #resizer {
+        display: none !important;
+    }
+}
+
+/* -------------------------------------
+   PRINT LAYOUT
+   ------------------------------------- */
+@media print {
+
+    #app-header,
+    #app-footer,
+    #editor-pane,
+    #resizer,
+    #mobile-toggle-bar,
+    .pane-header {
+        display: none !important;
+    }
+
+    #app-container,
+    #main-content {
+        height: auto;
+        overflow: visible;
+        display: block;
+    }
+
+    #preview-pane {
+        width: 100%;
+        display: block;
+    }
+
+    .pane-body {
+        overflow: visible;
+        padding: 0;
+        background: transparent;
+        color: black;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+}
