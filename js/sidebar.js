@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
     const btnSidebarCollapse = document.getElementById('btn-sidebar-collapse');
+    const btnSidebarOpenFolder = document.getElementById('btn-sidebar-open-folder');
     const btnSidebarAdd = document.getElementById('btn-sidebar-add');
     const btnSidebarClear = document.getElementById('btn-sidebar-clear');
 
@@ -139,6 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnToggleSidebar?.addEventListener('click', toggleSidebar);
     btnSidebarCollapse?.addEventListener('click', toggleSidebar);
+
+    // --- Open Folder Button ---
+    btnSidebarOpenFolder?.addEventListener('click', async () => {
+        await workspace.openFolder();
+    });
 
     // --- Add Files Button ---
     btnSidebarAdd?.addEventListener('click', () => {

@@ -36,7 +36,7 @@ const workspace = {
 
     // ---- File Management ----
 
-    addFile(path, content, handle = null) {
+    addFile(path, content, handle = null, openAsTab = true) {
         const normalizedPath = normalizePath(path);
         const name = normalizedPath.split('/').pop();
         this.files.set(normalizedPath, {
@@ -46,7 +46,9 @@ const workspace = {
             handle,
             modified: false,
         });
-        this.openTabs.add(normalizedPath);
+        if (openAsTab) {
+            this.openTabs.add(normalizedPath);
+        }
         this._saveFileToStorage(normalizedPath);
         this._saveWorkspaceMeta();
         dispatchEvent(new CustomEvent('workspace-changed', { detail: { path: normalizedPath, action: 'add' } }));
@@ -152,6 +154,7 @@ const workspace = {
     _saveWorkspaceMeta() {
         const meta = {
             filePaths: this.getFilePaths(),
+            openTabs: this.getOpenTabPaths(),
             rootName: this.rootName,
         };
         try {
@@ -186,6 +189,14 @@ const workspace = {
                     this.activeFile = normalizePath(savedActive);
                 } else if (this.files.size > 0) {
                     this.activeFile = this.files.keys().next().value;
+                }
+                // Restore open tabs
+                if (Array.isArray(meta.openTabs)) {
+                    for (const path of meta.openTabs) {
+                        if (this.files.has(normalizePath(path))) {
+                            this.openTabs.add(normalizePath(path));
+                        }
+                    }
                 }
                 return;
             } catch (e) {
@@ -231,7 +242,9 @@ const workspace = {
                 // Try to open index.md or README.md first, else first file
                 const paths = this.getFilePaths();
                 const preferred = paths.find(p => /index\.md$/i.test(p) || /readme\.md$/i.test(p));
-                this.setActiveFile(preferred || paths[0]);
+                const activePath = preferred || paths[0];
+                this.openTabs.add(activePath);
+                this.setActiveFile(activePath);
             }
             dispatchEvent(new CustomEvent('workspace-changed', { detail: { action: 'load-folder' } }));
             return true;
@@ -255,7 +268,7 @@ const workspace = {
                     try {
                         const file = await handle.getFile();
                         const content = await file.text();
-                        this.addFile(path, content, handle);
+                        this.addFile(path, content, handle, false);
                     } catch (e) {
                         console.warn('Failed to read file', path, e);
                     }
@@ -363,6 +376,7 @@ const workspace = {
         const normalizedPath = normalizePath(path);
         if (!this.files.has(normalizedPath)) return;
         this.openTabs.add(normalizedPath);
+        this._saveWorkspaceMeta();
         dispatchEvent(new CustomEvent('workspace-changed', { detail: { path: normalizedPath, action: 'open-tab' } }));
     },
 
@@ -374,12 +388,14 @@ const workspace = {
             const next = remaining.length > 0 ? remaining[remaining.length - 1] : null;
             this.setActiveFile(next);
         }
+        this._saveWorkspaceMeta();
         dispatchEvent(new CustomEvent('workspace-changed', { detail: { path: normalizedPath, action: 'close-tab' } }));
     },
 
     closeAllTabs() {
         this.openTabs.clear();
         this.setActiveFile(null);
+        this._saveWorkspaceMeta();
         dispatchEvent(new CustomEvent('workspace-changed', { detail: { action: 'close-all-tabs' } }));
     },
 
