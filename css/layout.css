@@ -45,12 +45,28 @@
     justify-content: flex-end;
 }
 
+/* Workspace Area (Sidebar + Main Content) */
+#workspace-area {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
 /* Main Two-Pane Workspace */
 #main-content {
     display: flex;
     flex: 1;
+    flex-direction: column;
     overflow: hidden;
     background-color: var(--bg-secondary);
+    min-width: 0;
+}
+
+/* Editor + Preview Row */
+#editor-area {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
 }
 
 .pane {
@@ -132,15 +148,32 @@
     padding: 0;
 }
 
-/* Developer placeholders */
-.placeholder-text {
+/* Empty workspace state */
+.workspace-empty {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
     color: var(--text-muted);
-    font-style: italic;
-    font-family: var(--font-mono);
+    gap: var(--space-3);
+    padding: var(--space-6);
+    text-align: center;
+}
+
+.workspace-empty .material-icons {
+    font-size: 48px;
+    opacity: 0.4;
+}
+
+.workspace-empty p {
+    font-size: 0.9rem;
+    max-width: 300px;
+    line-height: 1.5;
+}
+
+.workspace-empty .btn {
+    margin-top: var(--space-2);
 }
 
 /* Statusbar */
@@ -194,6 +227,21 @@
         justify-content: space-evenly;
     }
 
+    /* Sidebar becomes an overlay on mobile */
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        width: 260px;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+    }
+
+    #sidebar.collapsed {
+        width: 0;
+    }
+
     /* Force panes into stacked structure, handle visibility via JS */
     #main-content {
         flex-direction: column;
@@ -221,12 +269,15 @@
     #editor-pane,
     #resizer,
     #mobile-toggle-bar,
+    #sidebar,
+    #tab-bar,
     .pane-header {
         display: none !important;
     }
 
     #app-container,
-    #main-content {
+    #main-content,
+    #workspace-area {
         height: auto;
         overflow: visible;
         display: block;

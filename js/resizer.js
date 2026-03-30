@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const resizer = document.getElementById('resizer');
     const leftPane = document.getElementById('editor-pane');
-    const mainContent = document.getElementById('main-content');
+    const editorArea = document.getElementById('editor-area');
 
     // Check saved width
     const savedWidth = localStorage.getItem('fotg-pane-width');
@@ -30,11 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isResizing) return;
 
         // Calculate bounds (don't let pane shrink too much or expand too much)
-        const containerWidth = mainContent.clientWidth;
+        const containerWidth = editorArea.clientWidth;
         const minWidth = 200;
         const maxWidth = containerWidth - minWidth;
 
-        let newWidth = e.clientX;
+        // Subtract editorArea's left offset from viewport
+        const editorRect = editorArea.getBoundingClientRect();
+        let newWidth = e.clientX - editorRect.left;
 
         if (newWidth < minWidth) newWidth = minWidth;
         if (newWidth > maxWidth) newWidth = maxWidth;
@@ -67,11 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchmove', (e) => {
         if (!isResizing) return;
 
-        const containerWidth = mainContent.clientWidth;
+        const containerWidth = editorArea.clientWidth;
         const minWidth = 100;
         const maxWidth = containerWidth - minWidth;
 
-        let newWidth = e.touches[0].clientX;
+        const editorRect = editorArea.getBoundingClientRect();
+        let newWidth = e.touches[0].clientX - editorRect.left;
 
         if (newWidth < minWidth) newWidth = minWidth;
         if (newWidth > maxWidth) newWidth = maxWidth;

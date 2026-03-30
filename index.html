@@ -26,10 +26,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=html&display=swap" />
     <!-- Our Design System & Layout -->
-    <link rel="preload" href="css/style.min.css" as="style">
-    <link rel="preload" href="css/layout.min.css" as="style">
-    <link rel="stylesheet" href="css/style.min.css">
-    <link rel="stylesheet" href="css/layout.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
 
     <!-- Google Material Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap">
@@ -50,10 +48,14 @@
                 <h1>MarkShare</h1>
             </div>
             <div class="header-center" id="toolbar">
-                <button id="btn-open" class="toolbar-btn" title="Open File" aria-label="Open File"><span
+                <button id="btn-open-folder" class="toolbar-btn" title="Open Folder" aria-label="Open Folder"><span
                         class="material-icons" aria-hidden="true">folder_open</span></button>
+                <button id="btn-open" class="toolbar-btn" title="Open Files" aria-label="Open Files"><span
+                        class="material-icons" aria-hidden="true">note_add</span></button>
                 <button id="btn-save" class="toolbar-btn" title="Save (Ctrl+S)" aria-label="Save File"><span
                         class="material-icons" aria-hidden="true">save</span></button>
+                <button id="btn-save-all" class="toolbar-btn" title="Save All" aria-label="Save All"><span
+                        class="material-icons" aria-hidden="true">save_as</span></button>
                 <span class="toolbar-divider"></span>
                 <button id="btn-export" class="toolbar-btn" title="Export HTML" aria-label="Export HTML"><span
                         class="material-symbols-outlined" aria-hidden="true">html</span></button>
@@ -62,6 +64,8 @@
                 <button id="btn-reset" class="toolbar-btn text-danger" title="Clear All" aria-label="Clear All"><span
                         class="material-icons" aria-hidden="true">delete_sweep</span></button>
                 <span class="toolbar-divider"></span>
+                <button id="btn-toggle-sidebar" class="toolbar-btn active" title="Toggle Sidebar"
+                    aria-label="Toggle Sidebar"><span class="material-icons" aria-hidden="true">menu</span></button>
                 <button id="btn-sync-scroll" class="toolbar-btn active" title="Sync Scroll"
                     aria-label="Toggle Sync Scroll"><span class="material-icons" aria-hidden="true">sync</span></button>
                 <span class="toolbar-divider"></span>
@@ -112,50 +116,78 @@
             <button id="tab-preview" class="tab-btn">Preview</button>
         </div>
 
-        <!-- Main Workspace (Editor & Preview) -->
-        <main id="main-content">
-            <div id="editor-pane" class="pane">
-                <div class="pane-header">
-                    <span class="pane-header-title">Editor</span>
-                    <div class="pane-header-toolbar">
-                        <button id="btn-bold" class="toolbar-btn" title="Bold (Ctrl+B)" aria-label="Bold"><span
-                                class="material-icons" aria-hidden="true">format_bold</span></button>
-                        <button id="btn-italic" class="toolbar-btn" title="Italic (Ctrl+I)" aria-label="Italic"><span
-                                class="material-icons" aria-hidden="true">format_italic</span></button>
-                        <button id="btn-link" class="toolbar-btn" title="Link (Ctrl+K)" aria-label="Insert Link"><span
-                                class="material-icons" aria-hidden="true">link</span></button>
-                        <button id="btn-code" class="toolbar-btn" title="Code Block"
-                            aria-label="Insert Code Block"><span class="material-icons"
-                                aria-hidden="true">code</span></button>
-                        <button id="btn-mermaid" class="toolbar-btn" title="Mermaid Diagram"
-                            aria-label="Insert Mermaid Diagram"><span class="material-icons"
-                                aria-hidden="true">account_tree</span></button>
-                        <button id="btn-image" class="toolbar-btn" title="Insert Image" aria-label="Insert Image"><span
-                                class="material-icons" aria-hidden="true">image</span></button>
-                        <button id="btn-video" class="toolbar-btn" title="Insert Video" aria-label="Insert Video"><span
-                                class="material-icons" aria-hidden="true">movie</span></button>
-                        <button id="btn-reset" class="toolbar-btn text-danger" title="Clear All"
-                            aria-label="Clear All"><span class="material-icons"
-                                aria-hidden="true">delete_sweep</span></button>
+        <!-- Main Workspace Area -->
+        <div id="workspace-area">
+            <!-- Sidebar -->
+            <aside id="sidebar">
+                <div class="sidebar-header">
+                    <span>Explorer</span>
+                    <div class="sidebar-header-actions">
+                        <button id="btn-sidebar-add" class="toolbar-btn" title="Add Files" aria-label="Add Files"><span
+                                class="material-icons" aria-hidden="true">add</span></button>
+                        <button id="btn-sidebar-clear" class="toolbar-btn" title="Clear All Files" aria-label="Clear All Files"><span
+                                class="material-icons" aria-hidden="true">delete_sweep</span></button>
+                        <button id="btn-sidebar-collapse" class="toolbar-btn" title="Collapse Sidebar"
+                            aria-label="Collapse Sidebar"><span class="material-icons"
+                                aria-hidden="true">chevron_left</span></button>
                     </div>
                 </div>
-                <div id="editor-container" class="pane-body">
-                </div>
-            </div>
+                <div id="file-tree"></div>
+            </aside>
 
-            <!-- Resizer Gutter (Phase 4) -->
-            <div id="resizer"></div>
-
-            <div id="preview-pane" class="pane">
-                <div class="pane-header">Preview</div>
-                <div id="preview-container" class="pane-body">
+            <!-- Main Content (Tab Bar + Editor + Preview) -->
+            <main id="main-content">
+                <!-- Tab Bar -->
+                <div id="tab-bar">
+                    <!-- Tabs rendered dynamically -->
                 </div>
-            </div>
-        </main>
+
+                <!-- Editor & Preview Area -->
+                <div id="editor-area">
+                    <div id="editor-pane" class="pane">
+                        <div class="pane-header">
+                            <span class="pane-header-title">Editor</span>
+                            <div class="pane-header-toolbar">
+                                <button id="btn-bold" class="toolbar-btn" title="Bold (Ctrl+B)" aria-label="Bold"><span
+                                        class="material-icons" aria-hidden="true">format_bold</span></button>
+                                <button id="btn-italic" class="toolbar-btn" title="Italic (Ctrl+I)" aria-label="Italic"><span
+                                        class="material-icons" aria-hidden="true">format_italic</span></button>
+                                <button id="btn-link" class="toolbar-btn" title="Link (Ctrl+K)" aria-label="Insert Link"><span
+                                        class="material-icons" aria-hidden="true">link</span></button>
+                                <button id="btn-code" class="toolbar-btn" title="Code Block"
+                                    aria-label="Insert Code Block"><span class="material-icons"
+                                        aria-hidden="true">code</span></button>
+                                <button id="btn-mermaid" class="toolbar-btn" title="Mermaid Diagram"
+                                    aria-label="Insert Mermaid Diagram"><span class="material-icons"
+                                        aria-hidden="true">account_tree</span></button>
+                                <button id="btn-image" class="toolbar-btn" title="Insert Image" aria-label="Insert Image"><span
+                                        class="material-icons" aria-hidden="true">image</span></button>
+                                <button id="btn-video" class="toolbar-btn" title="Insert Video" aria-label="Insert Video"><span
+                                        class="material-icons" aria-hidden="true">movie</span></button>
+                                <button id="btn-reset" class="toolbar-btn text-danger" title="Clear All"
+                                    aria-label="Clear All"><span class="material-icons"
+                                        aria-hidden="true">delete_sweep</span></button>
+                            </div>
+                        </div>
+                        <div id="editor-container" class="pane-body">
+                        </div>
+                    </div>
+
+                    <!-- Resizer Gutter -->
+                    <div id="resizer"></div>
+
+                    <div id="preview-pane" class="pane">
+                        <div class="pane-header">Preview</div>
+                        <div id="preview-container" class="pane-body">
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
 
         <!-- Statusbar -->
         <footer id="app-footer">
-            <div class="status-left">Ready</div>
+            <div class="status-left" id="status-text">Ready</div>
             <div class="status-right">
                 <span id="word-count">0 words</span>
             </div>
@@ -163,13 +195,18 @@
     </div>
 
     <!-- Theme toggler & layout logic -->
-    <script defer src="js/theme.min.js"></script>
-    <script defer src="js/resizer.min.js"></script>
-    <script defer src="js/mobile.min.js"></script>
+    <script defer src="js/theme.js"></script>
+    <script defer src="js/resizer.js"></script>
+    <script defer src="js/mobile.js"></script>
+    <!-- Workspace modules -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/workspace.js"></script>
+    <script type="module" src="js/sidebar.js"></script>
+    <script type="module" src="js/tabs.js"></script>
     <!-- Editor logic (CodeMirror) -->
-    <script type="module" src="js/editor.min.js"></script>
+    <script type="module" src="js/editor.js"></script>
 
-    <!-- Confirmation Dialog -->
+    <!-- Confirmation Dialog (Clear Editor Content) -->
     <dialog id="reset-dialog" class="custom-dialog">
         <div class="dialog-content">
             <h3>Clear Editor?</h3>
@@ -177,6 +214,18 @@
             <div class="dialog-actions">
                 <button id="btn-dialog-cancel" class="btn btn-secondary">Cancel</button>
                 <button id="btn-dialog-confirm" class="btn btn-danger">Yes, Clear All</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Confirmation Dialog (Clear Workspace Files) -->
+    <dialog id="clear-workspace-dialog" class="custom-dialog">
+        <div class="dialog-content">
+            <h3>Clear All Files?</h3>
+            <p>Are you sure you want to remove all files from the explorer? This will close all tabs and clear the workspace.</p>
+            <div class="dialog-actions">
+                <button id="btn-clear-workspace-cancel" class="btn btn-secondary">Cancel</button>
+                <button id="btn-clear-workspace-confirm" class="btn btn-danger">Yes, Clear All</button>
             </div>
         </div>
     </dialog>

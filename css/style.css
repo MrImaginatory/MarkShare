@@ -517,6 +517,325 @@ a {
 }
 
 /* ==========================================
+   SIDEBAR & FILE TREE
+   ========================================== */
+
+#sidebar {
+    width: 20rem;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: width var(--transition-medium);
+    flex-shrink: 0;
+}
+
+#sidebar.collapsed {
+    width: 0;
+    border-right: none;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.sidebar-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.sidebar-header-actions .toolbar-btn {
+    padding: 2px 4px;
+    border: none;
+    background: transparent;
+}
+
+.sidebar-header-actions .toolbar-btn .material-icons {
+    font-size: 16px;
+}
+
+.sidebar-header-actions .toolbar-btn:hover {
+    background-color: var(--bg-elevated);
+}
+
+.sidebar-header-actions .toolbar-btn:hover .material-icons {
+    color: var(--text-primary);
+}
+
+.sidebar-header-actions #btn-sidebar-clear:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
+.sidebar-header-actions #btn-sidebar-clear:hover .material-icons {
+    color: var(--danger, #ef4444);
+}
+
+#file-tree {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-2) 0;
+    white-space: nowrap;
+}
+
+.tree-item {
+    display: flex;
+    align-items: center;
+    padding: 3px var(--space-3);
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-item:hover {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.tree-item.active {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+.tree-item .tree-icon {
+    flex-shrink: 0;
+    margin-right: var(--space-1);
+    font-size: 16px;
+    width: 18px;
+    text-align: center;
+}
+
+.tree-item .tree-chevron {
+    flex-shrink: 0;
+    margin-right: 2px;
+    font-size: 14px;
+    width: 16px;
+    text-align: center;
+    transition: transform var(--transition-fast);
+    color: var(--text-muted);
+}
+
+.tree-item .tree-chevron.expanded {
+    transform: rotate(90deg);
+}
+
+.tree-item .tree-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tree-folder-children {
+    overflow: hidden;
+}
+
+.tree-folder-children.collapsed {
+    display: none;
+}
+
+.tree-item .tree-modified-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* ==========================================
+   TAB BAR
+   ========================================== */
+
+#tab-bar {
+    display: flex;
+    align-items: stretch;
+    height: 34px;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-shrink: 0;
+    scrollbar-width: none;
+}
+
+#tab-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-item {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-3);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background-color: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    cursor: pointer;
+    white-space: nowrap;
+    min-width: 0;
+    max-width: 180px;
+    flex-shrink: 0;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+    user-select: none;
+    position: relative;
+}
+
+.tab-item:hover {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.tab-item.active {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.tab-item .tab-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: var(--space-1);
+}
+
+.tab-item .tab-modified-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    flex-shrink: 0;
+    margin-right: var(--space-1);
+}
+
+.tab-item .tab-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity var(--transition-fast), background-color var(--transition-fast);
+}
+
+.tab-item:hover .tab-close,
+.tab-item.active .tab-close {
+    opacity: 1;
+}
+
+.tab-close:hover {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.tab-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    flex-shrink: 0;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.tab-add-btn:hover {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.tab-add-btn .material-icons {
+    font-size: 18px;
+}
+
+.tab-close-all-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    flex-shrink: 0;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.tab-close-all-btn:hover {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.tab-close-all-btn .material-icons {
+    font-size: 16px;
+}
+
+/* ==========================================
+   WORKSPACE NOTIFICATIONS
+   ========================================== */
+
+.workspace-toast {
+    position: fixed;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    animation: toast-in 0.2s ease-out, toast-out 0.2s ease-in 2.8s forwards;
+    pointer-events: none;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes toast-out {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+}
+
+/* ==========================================
    PRINT OVERRIDES FOR DARK MODE
    ========================================== */
 @media print {
