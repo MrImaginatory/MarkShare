@@ -152,3 +152,21 @@ export function buildFileTree(filePaths) {
     sortTree(root);
     return root;
 }
+
+/**
+ * Generate a unique filename that doesn't exist in the workspace.
+ * e.g., "untitled.md", "untitled-1.md", etc.
+ */
+export function getUniqueFileName(existingPaths, baseName = 'untitled.md') {
+    if (!existingPaths.includes(baseName)) return baseName;
+
+    const ext = baseName.includes('.') ? baseName.substring(baseName.lastIndexOf('.')) : '';
+    const nameWithoutExt = baseName.includes('.') ? baseName.substring(0, baseName.lastIndexOf('.')) : baseName;
+
+    let counter = 1;
+    while (true) {
+        const newName = `${nameWithoutExt}-${counter}${ext}`;
+        if (!existingPaths.includes(newName)) return newName;
+        counter++;
+    }
+}

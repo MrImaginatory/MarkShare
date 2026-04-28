@@ -7,7 +7,7 @@ import { EditorState } from "https://esm.sh/@codemirror/state@6.4.0";
 import { EditorView, basicSetup } from "https://esm.sh/codemirror@6.0.1?deps=@codemirror/state@6.4.0";
 import { markdown } from "https://esm.sh/@codemirror/lang-markdown@6.2.5?deps=@codemirror/state@6.4.0";
 import workspace from './workspace.js';
-import { isRelativeMdLink, stripFragment, getFragment, getFileName } from './utils.js';
+import { isRelativeMdLink, stripFragment, getFragment, getFileName, getUniqueFileName } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById("editor-container");
@@ -474,13 +474,25 @@ ${content}
     const btnSave = document.getElementById('btn-save');
     if (btnSave) {
         btnSave.addEventListener('click', async () => {
-            if (!workspace.activeFile) return;
-            const file = workspace.getActiveFile();
+            let activePath = workspace.activeFile;
+
+            // If no file is open, create a new one with current editor content
+            if (!activePath) {
+                const content = view.state.doc.toString();
+                const newPath = getUniqueFileName(workspace.getFilePaths(), 'new-file.md');
+                workspace.addFile(newPath, content);
+                workspace.setActiveFile(newPath);
+                activePath = newPath;
+                showToast(`Created and saving: ${newPath}`);
+            }
+
+            const file = workspace.getFile(activePath);
+            if (!file) return;
 
             // Try saving to disk via File System Access API
-            const saved = await workspace.saveFileToDisk(workspace.activeFile);
+            const saved = await workspace.saveFileToDisk(activePath);
             if (saved) {
-                showToast(`Saved: ${getFileName(workspace.activeFile)}`);
+                showToast(`Saved: ${getFileName(activePath)}`);
                 updateStatus();
                 return;
             }
@@ -491,10 +503,10 @@ ${content}
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = getFileName(workspace.activeFile);
+            a.download = getFileName(activePath);
             a.click();
             URL.revokeObjectURL(url);
-            workspace.markSaved(workspace.activeFile);
+            workspace.markSaved(activePath);
             updateStatus();
         });
     }
@@ -514,14 +526,16 @@ ${content}
     }
 
     // ---- Reset/Clear ----
-    const btnReset = document.getElementById('btn-reset');
+    const resetBtns = document.querySelectorAll('#btn-header-reset, #btn-editor-reset');
     const resetDialog = document.getElementById('reset-dialog');
     const btnDialogConfirm = document.getElementById('btn-dialog-confirm');
     const btnDialogCancel = document.getElementById('btn-dialog-cancel');
 
-    if (btnReset && resetDialog) {
-        btnReset.addEventListener('click', () => {
-            resetDialog.showModal();
+    if (resetBtns.length > 0 && resetDialog) {
+        resetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                resetDialog.showModal();
+            });
         });
 
         btnDialogCancel.addEventListener('click', () => {
@@ -535,16 +549,19 @@ ${content}
         });
 
         btnDialogConfirm.addEventListener('click', () => {
-            // Clear current active file content
+            // Clear CodeMirror editor
+            isLoadingFile = true;
+            view.dispatch({
+                changes: { from: 0, to: view.state.doc.length, insert: "" }
+            });
+            isLoadingFile = false;
+
+            // Clear current active file content in workspace if exists
             if (workspace.activeFile) {
-                isLoadingFile = true;
-                view.dispatch({
-                    changes: { from: 0, to: view.state.doc.length, insert: "" }
-                });
-                isLoadingFile = false;
                 workspace.updateFileContent(workspace.activeFile, "");
-                renderPreview("");
             }
+            
+            renderPreview("");
             resetDialog.close();
         });
     }
