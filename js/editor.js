@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     div.style.justifyContent = 'center';
                     div.style.margin = '1rem 0';
                     div.innerHTML = svg;
+                    div.dataset.mermaidSource = source;
                     pre.replaceWith(div);
                 } catch (e) {
                     console.error('Mermaid render error', e);
@@ -530,6 +531,25 @@ ${content}
                 svg.parentNode.replaceChild(pngImg, svg);
             } catch (e) {
                 console.warn('SVG rasterize failed, skipping:', e);
+            }
+        }
+
+        // Re-render Mermaid diagrams in light theme so html2canvas captures them natively
+        const mermaidDivs = previewContainer.querySelectorAll('.mermaid-rendered');
+        if (window.mermaid && mermaidDivs.length > 0) {
+            window.mermaid.initialize({ startOnLoad: false, theme: 'default' });
+            for (const div of mermaidDivs) {
+                const source = div.dataset.mermaidSource;
+                if (!source) continue;
+                const oldSvg = div.querySelector('svg');
+                if (!oldSvg) continue;
+                try {
+                    const renderId = 'mermaid-pdf-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+                    const { svg: lightSvg } = await window.mermaid.render(renderId, source);
+                    div.innerHTML = lightSvg;
+                } catch (e) {
+                    console.warn('Mermaid light re-render failed for PDF:', e);
+                }
             }
         }
 

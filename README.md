@@ -84,7 +84,8 @@ The application follows a **design system approach** with CSS custom properties 
 - **File System Access API** — save files directly back to disk (Chrome/Edge)
 - **Sidebar file explorer** — collapsible tree view of all workspace files
 - **Auto-save to localStorage** — content persists across sessions
-- **Print/PDF support** — clean print layout with dark mode overrides
+- **Print** — clean print layout with dark mode overrides
+- **Save to PDF** — generate a standalone PDF with filename, date, URL, and page numbers via html2pdf.js
 
 ---
 
@@ -118,7 +119,7 @@ Open [`markshare.netlify.app`](https://markshare.netlify.app/) in a modern web b
 | Feature | Description |
 |---|---|
 | **Open Folder** | Load an entire directory of `.md`/`.txt` files recursively via File System Access API |
-| **Open Files** | Add individual files via file picker (supports multi-select) |
+| **New File** | Create a new untitled Markdown file in the workspace |
 | **Sidebar Explorer** | Collapsible file tree showing all workspace files with folder hierarchy |
 | **Tab Bar** | VS Code-style tabs — only opened files appear; closing a tab keeps the file in workspace |
 | **Active File Tracking** | Visual indicators for the currently active file in sidebar and tab bar |
@@ -134,9 +135,10 @@ Open [`markshare.netlify.app`](https://markshare.netlify.app/) in a modern web b
 | **Save (`Ctrl+S`)** | Saves the active file via File System Access API, or downloads as fallback |
 | **Save All (`Ctrl+Shift+S`)** | Saves all modified files to disk |
 | **Open Folder** | Uses `showDirectoryPicker()` to browse and load a directory |
-| **Open Files** | Standard file input for `.md` and `.txt` files |
+| **New File** | Creates a new untitled `.md` file in the workspace via the add button |
 | **Export HTML** | Generates a self-contained standalone HTML file with embedded styles |
-| **Print/PDF** | Opens browser print dialog with a clean, print-optimized layout |
+| **Print** | Opens browser's native print dialog with a clean, print-optimized layout |
+| **Save to PDF** | Generates a PDF via html2pdf.js with filename, date, URL, and page numbers |
 | **Clear All** | Clears the active file's content (with confirmation dialog) |
 | **Clear Workspace** | Removes all files from the explorer (with confirmation dialog) |
 
@@ -323,7 +325,7 @@ cleancss -o css/layout.min.css css/layout.css
 4. The sidebar shows the folder structure
 5. `index.md` or `README.md` is auto-opened if present; otherwise the first file
 
-> **Note:** Folder browsing requires the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API), available in Chrome and Edge. Firefox and Safari users can open individual files instead.
+> **Note:** Folder browsing requires the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API), available in Chrome and Edge. Firefox and Safari users can create new files using the add button instead of opening folders.
 
 ### Navigating Links
 
