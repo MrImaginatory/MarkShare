@@ -117,6 +117,58 @@ const workspace = {
         this.setActiveFile(path);
     },
 
+    renameFile(oldPath, newName) {
+        const normalizedOld = normalizePath(oldPath);
+        const oldFile = this.files.get(normalizedOld);
+        if (!oldFile) return false;
+
+        const pathParts = normalizedOld.split('/');
+        pathParts.pop(); // remove old name
+        pathParts.push(newName); // add new name
+        const newPath = pathParts.join('/');
+        const normalizedNew = normalizePath(newPath);
+
+        if (this.files.has(normalizedNew) && normalizedNew !== normalizedOld) {
+            return false; // file with this name already exists
+        }
+
+        if (normalizedNew === normalizedOld) return true; // no change
+
+        // Add under new path
+        this.files.set(normalizedNew, {
+            ...oldFile,
+            name: newName,
+            path: normalizedNew
+        });
+        
+        // Remove old path
+        this.files.delete(normalizedOld);
+        localStorage.removeItem(fileStorageKey(normalizedOld));
+        this._saveFileToStorage(normalizedNew);
+
+        // Update active file if needed
+        if (this.activeFile === normalizedOld) {
+            this.activeFile = normalizedNew;
+            localStorage.setItem(ACTIVE_FILE_KEY, normalizedNew);
+        }
+
+        // Update open tabs
+        if (this.openTabs.has(normalizedOld)) {
+            this.openTabs.delete(normalizedOld);
+            this.openTabs.add(normalizedNew);
+        }
+
+        this._saveWorkspaceMeta();
+        
+        // Dispatch events
+        dispatchEvent(new CustomEvent('workspace-changed', { detail: { path: normalizedNew, action: 'rename', oldPath: normalizedOld } }));
+        if (this.activeFile === normalizedNew) {
+            dispatchEvent(new CustomEvent('active-file-changed', { detail: { path: normalizedNew } }));
+        }
+        return true;
+    },
+
+
     /**
      * Update the content of a file (called from editor on change).
      */

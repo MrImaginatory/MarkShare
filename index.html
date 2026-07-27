@@ -15,6 +15,9 @@
     <!-- Parser & Sanitizer -->
     <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+    
+    <!-- PDF Generation -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <!-- Code Syntax Highlighting (Browser Bundle) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css"
@@ -62,8 +65,10 @@
                 <span class="toolbar-divider"></span>
                 <button id="btn-export" class="toolbar-btn" title="Export HTML" aria-label="Export HTML"><span
                         class="material-symbols-outlined" aria-hidden="true">html</span></button>
-                <button id="btn-print" class="toolbar-btn" title="Print/PDF" aria-label="Print or PDF"><span
+                <button id="btn-print" class="toolbar-btn" title="Print" aria-label="Print"><span
                         class="material-icons" aria-hidden="true">print</span></button>
+                <button id="btn-save-pdf" class="toolbar-btn" title="Save to PDF" aria-label="Save to PDF"><span
+                        class="material-icons" aria-hidden="true">picture_as_pdf</span></button>
                 <button id="btn-header-reset" class="toolbar-btn text-danger" title="Clear All" aria-label="Clear All"><span
                         class="material-icons" aria-hidden="true">delete_sweep</span></button>
                 <span class="toolbar-divider"></span>

@@ -103,6 +103,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = document.createElement('span');
         name.className = 'tree-name';
         name.textContent = node.name;
+        
+        name.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            name.contentEditable = true;
+            name.focus();
+            
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(name);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            const originalName = name.textContent;
+            
+            const finishRename = () => {
+                name.contentEditable = false;
+                const newName = name.textContent.trim();
+                if (newName && newName !== originalName) {
+                    let finalName = newName.endsWith('.md') ? newName : newName + '.md';
+                    if (!workspace.renameFile(node.path, finalName)) {
+                        name.textContent = originalName;
+                    }
+                } else {
+                    name.textContent = originalName;
+                }
+            };
+            
+            name.addEventListener('blur', finishRename, { once: true });
+            name.addEventListener('keydown', (ke) => {
+                if (ke.key === 'Enter') {
+                    ke.preventDefault();
+                    name.blur();
+                } else if (ke.key === 'Escape') {
+                    name.textContent = originalName;
+                    name.blur();
+                }
+            });
+        });
+        
         item.appendChild(name);
 
         if (workspace.isModified(node.path)) {

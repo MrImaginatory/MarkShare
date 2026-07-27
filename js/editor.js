@@ -448,6 +448,160 @@ ${content}
         window.print();
     });
 
+    document.getElementById('btn-save-pdf')?.addEventListener('click', async () => {
+        const previewContainer = document.getElementById('preview-container');
+        if (!previewContainer) return;
+        
+        let filename = 'document.pdf';
+        let rawFileName = 'Untitled.md';
+        if (workspace.activeFile) {
+            const pathParts = workspace.activeFile.split('/');
+            rawFileName = pathParts[pathParts.length - 1];
+            filename = rawFileName.replace(/\.md$/i, '') + '.pdf';
+        }
+        
+        const currentUrl = window.location.href;
+        const currentDateTime = new Date().toLocaleString();
+
+        // ponytail: pre-rasterize SVGs to PNG before pdf gen. Fixes html2canvas SVG bugs.
+        const svgElements = previewContainer.querySelectorAll('svg');
+        const svgBackups = []; // store {parent, svg, img} to restore after
+
+        for (const svg of svgElements) {
+            const rect = svg.getBoundingClientRect();
+            if (!rect.width || !rect.height) continue;
+
+            try {
+                const svgClone = svg.cloneNode(true);
+                svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                svgClone.setAttribute('width', rect.width);
+                svgClone.setAttribute('height', rect.height);
+                
+                // Inline all computed styles into SVG clone so it renders standalone
+                const allEls = svg.querySelectorAll('*');
+                const cloneEls = svgClone.querySelectorAll('*');
+                allEls.forEach((el, i) => {
+                    if (cloneEls[i]) {
+                        const cs = getComputedStyle(el);
+                        let style = '';
+                        for (let j = 0; j < cs.length; j++) {
+                            const prop = cs[j];
+                            style += `${prop}:${cs.getPropertyValue(prop)};`;
+                        }
+                        cloneEls[i].setAttribute('style', style);
+                    }
+                });
+                // Also inline root SVG styles
+                const rootCs = getComputedStyle(svg);
+                let rootStyle = '';
+                for (let j = 0; j < rootCs.length; j++) {
+                    const prop = rootCs[j];
+                    rootStyle += `${prop}:${rootCs.getPropertyValue(prop)};`;
+                }
+                svgClone.setAttribute('style', rootStyle);
+
+                const svgData = new XMLSerializer().serializeToString(svgClone);
+                const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+
+                const img = await new Promise((resolve, reject) => {
+                    const image = new Image();
+                    image.onload = () => resolve(image);
+                    image.onerror = reject;
+                    image.src = url;
+                });
+
+                const canvas = document.createElement('canvas');
+                canvas.width = rect.width * 2;
+                canvas.height = rect.height * 2;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(2, 2);
+                ctx.drawImage(img, 0, 0, rect.width, rect.height);
+                URL.revokeObjectURL(url);
+
+                const pngImg = document.createElement('img');
+                pngImg.src = canvas.toDataURL('image/png');
+                pngImg.style.width = rect.width + 'px';
+                pngImg.style.height = rect.height + 'px';
+                pngImg.style.display = 'block';
+                pngImg.style.margin = '0 auto';
+
+                svgBackups.push({ parent: svg.parentNode, svg, nextSibling: svg.nextSibling, img: pngImg });
+                svg.parentNode.replaceChild(pngImg, svg);
+            } catch (e) {
+                console.warn('SVG rasterize failed, skipping:', e);
+            }
+        }
+
+        const opt = {
+            margin:       [25, 20, 25, 20],
+            filename:     filename,
+            image:        { type: 'jpeg', quality: 1.0 },
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true,
+                onclone: (clonedDoc) => {
+                    clonedDoc.documentElement.setAttribute('data-theme', 'light');
+                    const clonedContainer = clonedDoc.getElementById('preview-container');
+                    if (clonedContainer) {
+                        clonedContainer.style.padding = '0';
+                        clonedContainer.style.backgroundColor = '#ffffff';
+                        clonedContainer.style.color = '#18181b';
+                        clonedContainer.style.height = 'auto';
+                        clonedContainer.style.overflow = 'visible';
+                        
+                        let parent = clonedContainer.parentElement;
+                        while (parent && parent !== clonedDoc.body) {
+                            parent.style.height = 'auto';
+                            parent.style.overflow = 'visible';
+                            parent = parent.parentElement;
+                        }
+                    }
+                }
+            },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        const restoreSvgs = () => {
+            svgBackups.forEach(({ parent, svg, nextSibling, img }) => {
+                if (img.parentNode) {
+                    if (nextSibling) {
+                        parent.insertBefore(svg, nextSibling);
+                    } else {
+                        parent.appendChild(svg);
+                    }
+                    img.remove();
+                }
+            });
+        };
+
+        if (window.html2pdf) {
+            try {
+                const worker = window.html2pdf().from(previewContainer).set(opt);
+                const pdf = await worker.toPdf().get('pdf');
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text(rawFileName, pdf.internal.pageSize.getWidth() - 20, 12, { align: 'right' });
+                    pdf.text(currentDateTime, 20, pdf.internal.pageSize.getHeight() - 12);
+                    pdf.text(currentUrl, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 12, { align: 'center' });
+                    pdf.text('Page ' + i + ' of ' + totalPages, pdf.internal.pageSize.getWidth() - 20, pdf.internal.pageSize.getHeight() - 12, { align: 'right' });
+                }
+                await worker.save();
+            } catch (e) {
+                console.error('PDF generation failed:', e);
+            } finally {
+                restoreSvgs();
+            }
+        } else {
+            console.error("html2pdf library not loaded.");
+            alert("PDF generation library not available.");
+            restoreSvgs();
+        }
+    });
+
     // ---- File I/O — Open Folder ----
     document.getElementById('btn-open-folder')?.addEventListener('click', async () => {
         await workspace.openFolder();
