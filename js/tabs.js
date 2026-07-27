@@ -72,16 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addBtn.title = 'Add File';
         addBtn.innerHTML = '<span class="material-icons">add</span>';
         addBtn.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.md,.txt,text/markdown,text/plain';
-            input.multiple = true;
-            input.onchange = e => {
-                if (e.target.files.length > 0) {
-                    workspace.addFilesFromFileList(e.target.files);
-                }
-            };
-            input.click();
+            workspace.createNewFile();
         });
         tabBar.appendChild(addBtn);
     }

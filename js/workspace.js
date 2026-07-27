@@ -99,6 +99,24 @@ const workspace = {
         return this.files.get(this.activeFile) || null;
     },
 
+    createNewFile() {
+        let counter = 1;
+        let name = `Untitled-${counter}.md`;
+        let path = name;
+        if (this.rootName) {
+            path = `${this.rootName}/${name}`;
+        }
+        
+        while (this.hasFile(path)) {
+            counter++;
+            name = `Untitled-${counter}.md`;
+            path = this.rootName ? `${this.rootName}/${name}` : name;
+        }
+
+        this.addFile(path, '# New File\n', null, true);
+        this.setActiveFile(path);
+    },
+
     /**
      * Update the content of a file (called from editor on change).
      */
